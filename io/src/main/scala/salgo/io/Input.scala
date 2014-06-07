@@ -4,7 +4,7 @@ import scala.language.experimental.macros
 import scala.language.higherKinds
 
 import java.io.{Console => _, _}
-import IoDsl._
+import Dsl._
 
 trait Input {
 

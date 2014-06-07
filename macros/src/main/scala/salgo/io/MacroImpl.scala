@@ -1,14 +1,6 @@
 package salgo.io
 
-import salgo.io.IoDsl.Format
-import salgo.io.IoDsl.ConstRep
-import salgo.io.IoDsl.VarRep
-import salgo.io.IoDsl.Token
-import salgo.io.IoDsl.Line
-import salgo.io.IoDsl.DoubleFmt
-import salgo.io.IoDsl.IntFmt
-import salgo.io.IoDsl.LongFmt
-import salgo.io.IoDsl.Cons
+import salgo.io.Dsl._
 
 object MacroImpl {
   import scala.reflect.macros.whitebox.Context
@@ -27,15 +19,9 @@ object MacroImpl {
               val constRep = symbolOf[ConstRep.type].asClass.module
               q"$constRep(${preEval(e)}, $x)"
 
-            case Ident(TermName(x)) =>
-              // Same code as the next clause,
-              // but variable bindings in multiple conditions are not supported currently
-              val varRep = symbolOf[VarRep.type].asClass.module
-              q"$varRep(${preEval(e)}, $x)"
-
-            case Select(_, TermName(x)) =>
-              val varRep = symbolOf[VarRep.type].asClass.module
-              q"$varRep(${preEval(e)}, $x)"
+            case _ =>
+              val exprRep = symbolOf[ExprRep.type].asClass.module
+              q"$exprRep(${preEval(e)}, ${showCode(n)})"
           }
         case q"$a +[$_] $b" =>
           q"${preEval(a)} + ${preEval(b)}"
@@ -94,14 +80,14 @@ object MacroImpl {
           val tuple = List.fill(n)(q"$elemAct")
           q"(..$tuple)"
 
-        case VarRep(elemFmt, x) =>
-          val n = Ident(TermName(x))
+        case ExprRep(elemFmt, x) =>
+          val expr = c.parse(x)
           val etyp = typ.typeArgs(0)
           val elemAct = formatToTree(elemFmt, etyp)
           q"""
             val buf = collection.mutable.ListBuffer.empty[$etyp]
             var i = 0
-            while (i < $n) {
+            while (i < $expr) {
               buf += $elemAct
               i += 1
             }

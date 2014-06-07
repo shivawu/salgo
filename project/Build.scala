@@ -26,7 +26,9 @@ object ScalgoBuild extends Build {
     libraryDependencies += "org.scala-lang" % "scala-reflect" % Versions.scalaVersion
   }
 
-  lazy val io = Project(id = "io", base = file("io")).settings(commonSettings:_*).dependsOn(macros)
+  lazy val io = Project(id = "io", base = file("io")).settings(commonSettings:_*).dependsOn(macros).settings {
+    libraryDependencies += "org.scalatest" %% "scalatest" % "2.1.7" % "test"
+  }
 
   lazy val root = Project(id = "salgo", base = file(".")).settings(commonSettings:_*).aggregate(macros, io)
 }
