@@ -8,7 +8,11 @@ object Meta {
 }
 
 object Versions {
-  val scalaVersion = "2.11.1"
+  val scala = "2.11.1"
+
+  val scalaTest = "2.2.0"
+
+  val paradiseVersion = "2.0.0"
 }
 
 object ScalgoBuild extends Build {
@@ -16,18 +20,20 @@ object ScalgoBuild extends Build {
   lazy val commonSettings = Seq(
     organization := Meta.organization,
   	version := Meta.version,
-  	scalaVersion := Versions.scalaVersion,
+  	scalaVersion := Versions.scala,
   	scalacOptions ++= Seq("-deprecation", "-feature"),
     scalacOptions in (Compile, console) += "-Ymacro-debug-lite",
-      incOptions := incOptions.value.withNameHashing(nameHashing = true)
+    incOptions := incOptions.value.withNameHashing(nameHashing = true),
+    resolvers += Resolver.sonatypeRepo("releases"),
+    addCompilerPlugin("org.scalamacros" % "paradise" % Versions.paradiseVersion cross CrossVersion.full)
   )
 
   lazy val macros = Project(id = "macros", base = file("macros")).settings(commonSettings:_*).settings {
-    libraryDependencies += "org.scala-lang" % "scala-reflect" % Versions.scalaVersion
+    libraryDependencies += "org.scala-lang" % "scala-reflect" % Versions.scala
   }
 
   lazy val io = Project(id = "io", base = file("io")).settings(commonSettings:_*).dependsOn(macros).settings {
-    libraryDependencies += "org.scalatest" %% "scalatest" % "2.1.7" % "test"
+    libraryDependencies += "org.scalatest" %% "scalatest" % Versions.scalaTest % "test"
   }
 
   lazy val root = Project(id = "salgo", base = file(".")).settings(commonSettings:_*).aggregate(macros, io)
