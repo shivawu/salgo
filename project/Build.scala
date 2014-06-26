@@ -15,7 +15,7 @@ object Versions {
   val paradiseVersion = "2.0.0"
 }
 
-object ScalgoBuild extends Build {
+object SalgoBuild extends Build {
 
   lazy val commonSettings = Seq(
     organization := Meta.organization,
@@ -35,6 +35,8 @@ object ScalgoBuild extends Build {
   lazy val io = Project(id = "io", base = file("io")).settings(commonSettings:_*).dependsOn(macros).settings {
     libraryDependencies += "org.scalatest" %% "scalatest" % Versions.scalaTest % "test"
   }
+
+  lazy val collection = Project(id = "collection", base = file("collection")).settings(commonSettings:_*)
 
   lazy val root = Project(id = "salgo", base = file(".")).settings(commonSettings:_*).aggregate(macros, io)
 }

@@ -1,6 +1,7 @@
 package salgo.io
 
 import scala.language.implicitConversions
+import salgo.util.TuplePlus
 
 object Dsl {
   sealed trait Format[T] {
@@ -24,4 +25,8 @@ object Dsl {
   implicit def intToFmt(int: Int.type) = IntFmt
   implicit def longToFmt(long: Long.type) = LongFmt
   implicit def doubleToFmt(dbl: Double.type) = DoubleFmt
+
+  implicit object FormatTuplePlus extends TuplePlus[Format] {
+    override def plus[A, B](a: Format[A], b: Format[B]): Format[(A, B)] = Cons(a, b)
+  }
 }
