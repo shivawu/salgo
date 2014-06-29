@@ -38,5 +38,5 @@ object SalgoBuild extends Build {
 
   lazy val collection = Project(id = "collection", base = file("collection")).settings(commonSettings:_*)
 
-  lazy val root = Project(id = "salgo", base = file(".")).settings(commonSettings:_*).aggregate(macros, io)
+  lazy val root = Project(id = "salgo", base = file(".")).settings(commonSettings:_*).aggregate(macros, io, collection)
 }

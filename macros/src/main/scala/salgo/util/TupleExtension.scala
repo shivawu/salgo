@@ -13,18 +13,13 @@ class TupleExtension extends StaticAnnotation {
 object TupleExtension {
   private val maxArity = 10
 
+  import MacroAnnotationUtil._
+
   // TODO: parameter can also be a generic type with the given type argument
   def impl(c: Context)(annottees: c.Expr[Any]*): c.Expr[Any] = {
     import c.universe._
 
-    println("prefix: " + showRaw(c.prefix))
-    println("app: " + showRaw(c.macroApplication))
-
-    val inputs = annottees.map(_.tree).toList
-    val (method, _) = inputs match {
-      case (method: DefDef) :: rest => (method, rest)
-      case _ => c.abort(c.enclosingPosition, "TupleExtension must be applied to a method")
-    }
+    val method = onMethod(c)(annottees(0))
 
     try {
       val q"$modifiers def $methodName[$typeParam]($paramName: $paramType): $returnType = $_" = method
@@ -84,26 +79,3 @@ object TupleExtension {
     }
   }
 }
-
-class TestAnnotation(val x: Int, val y: Int) extends StaticAnnotation {
-  def macroTransform(annottees: Any*): Any = macro TestAnnotation.impl
-}
-
-object TestAnnotation {
-  def impl(c: Context)(annottees: c.Expr[Any]*): c.Expr[Any] = {
-    annottees(0)
-  }
-}
-/*
-implicit object ListTuplePlus extends TuplePlus[List] {
-  def plus[A, B](a: List[A], b: List[B]): List[(A, B)] = ???
-}
-
-
-@salgo.util.TupleExtension({
-  forA {
-    FOR << XX
-    X << Y
-  } yieldA FOR
-}) object $
- */
